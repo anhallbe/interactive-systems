@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Build file for TAG assignment on the PRIS course. -->
+<!-- 26-feb-2010/FK -->
+<!-- 07-feb-2008/FK -->
+
+<!-- ***************************************************************** -->
+
+<!-- Define project name, and default target.
+     Target "all" is run if no target is specified when run. -->
+
+<project basedir="." name="tag" default="all">
+
+  <!-- Define variables that we use later on -->
+  <property name="deedeecapsname"  value="Deedee"/>
+  <property name="dextercapsname"  value="Dexter"/>
+  <property name="bailiffcapsname" value="Bailiff"/>
+
+  <!-- Define locations for source and build trees -->
+  <property name="dir.build"    location="build"/>
+  <property name="dir.dist"     location="dist"/>
+  <property name="dir.src"      location="src"/>
+  <property name="dir.manifest" location="mf"/>
+
+  <!-- Define the total classpath for the project -->
+  <path id="project.class.path">
+    <!-- Include all JAR-files in the lib directory -->
+    <fileset dir="lib">
+      <include name="**/*.jar"/>
+    </fileset>
+  </path>
+
+  <target name="init" description="Create build-directories">
+    <!-- Create the build and dist directories if they dont exist. -->
+    <mkdir dir="${dir.build}"/>
+    <mkdir dir="${dir.dist}"/>
+  </target>
+
+  <target name="compile" depends="init" description="Compile source code">
+    <!-- Compile all code in the source directory, put class files -->
+    <!-- in the build directory. -->
+    <javac debug="true"
+           deprecation="true"
+	   destdir="${dir.build}"
+	   source="1.4"
+	   target="1.4"
+	   srcdir="${dir.src}">
+      <classpath refid="project.class.path"/>
+    </javac>
+  </target>
+
+  <target name="rmic" depends="compile"
+          description="Create RMI stubs and skeletons">
+    <!-- Create RMI stubs and skeletons -->
+    <rmic includes="**/*${bailiffcapsname}.class"
+          base="${dir.build}">
+      <classpath refid="project.class.path"/>
+    </rmic>
+  </target>
+
+  <target name="jar" depends="rmic" description="Build JAR-files.">
+    <!-- We create four jar files. -->
+    <jar basedir="${dir.build}" compress="true"
+         destfile="${dir.dist}/${deedeecapsname}.jar"
+	 manifest="${dir.manifest}/${deedeecapsname}.manifest"
+	 includes="**/Deedee.class,\
+	           **/Deedee$$1.class,\
+		   **/DeedeeGUI.class">
+    </jar>
+    <jar basedir="${dir.src}" compress="true" update="true"
+         destfile="${dir.dist}/${deedeecapsname}.jar"
+	 includes="**/Angry.gif,\
+	           **/Asleep.gif,\
+		   **/BasicSmile.gif,\
+	           **/Concerned.gif,\
+		   **/HappilySurprised.gif,\
+	           **/Laughing.gif,\
+		   **/Moody.gif,\
+	           **/Waiting.gif,\
+		   **/VeryAngry.gif">
+    </jar>
+         
+    <jar basedir="${dir.build}" compress="true"
+         destfile="${dir.dist}/${dextercapsname}.jar"
+	 manifest="${dir.manifest}/${dextercapsname}.manifest"
+	 includes="**/Dexter.class,\
+	           **/Dexter$$1.class,\
+		   **/DexterFace.class">
+    </jar>
+
+    <jar basedir="${dir.build}" compress="true"
+         destfile="${dir.dist}/${bailiffcapsname}.jar"
+	 manifest="${dir.manifest}/${bailiffcapsname}.manifest"
+	 includes="**/Bailiff$$agitator.class,\
+	           **/Bailiff$$IDListener.class,\
+		   **/Bailiff.class
+		   **/Bailiff_Skel.class
+		   **/Bailiff_Stub.class
+		   **/BailiffFrame$$1.class
+		   **/BailiffFrame$$2.class
+		   **/BailiffFrame$$3.class
+		   **/BailiffFrame$$4.class
+		   **/BailiffFrame$$5.class
+		   **/BailiffInterface.class">
+    </jar>
+
+    <jar basedir="${dir.build}" compress="true"
+         destfile="${dir.dist}/${bailiffcapsname}-dl.jar"
+	 includes="**/Bailiff_Skel.class
+		   **/Bailiff_Stub.class
+		   **/BailiffInterface.class">
+    </jar>
+
+    <jar basedir="${dir.build}" compress="true"
+         destfile="${dir.dist}/util.jar"
+	 includes="**/CmdlnOption.class,\
+	           **/Commandline.class,\
+		   **/Logger.class">
+
+    </jar>
+  </target>
+
+  <!-- The default target. The dependency chain makes do all. -->
+  <target name="all" depends="jar" description="Build everything.">
+    <echo message="Application built!"/>
+  </target>
+
+  <!-- Install copies of the JAR files in the test directory. -->
+  <target name="install" depends="jar" description="Install jar-files.">
+    <!-- The cbs directory -->
+    <copy todir="../test/cbs">
+      <fileset dir="./dist">
+	<include name="${bailiffcapsname}.jar"/>
+	<include name="${bailiffcapsname}-dl.jar"/>
+	<include name="${deedeecapsname}.jar"/>
+	<include name="${dextercapsname}.jar"/>
+	<include name="util.jar"/>
+      </fileset>
+      <fileset dir="./lib">
+	<include name="*.jar"/>
+      </fileset>
+    </copy>
+    <!-- Message to user -->
+    <echo message="Test files installed!"/>
+  </target>
+
+  <!-- Clean removes all created files and directories -->
+  <target name="clean" description="Clean all buildable directories.">
+    <delete dir="${dir.dist}"/>
+    <delete dir="${dir.build}"/>
+    <delete>
+      <fileset dir="../test/cbs">
+	<include name="*.jar"/>
+      </fileset>
+    </delete>
+  </target>
+</project>

@@ -1,0 +1,94 @@
+07-feb-2011/FK
+
+Programming of Interactive Systems, lab 1
+
+You are encouraged to tackle a few of the optional tasks in order to
+familiarise yourself with the software and source code.
+
+
+Optional tasks for the chat-programs.
+
+* Fix the bug in the client that makes it difficult to connect to the
+  servers that have a capital letter in their name.
+
+* Make the client indicate to the user when it detects changes among
+  the available servers (added or removed), so that the user does not
+  need to continuously type the '.list' command.
+
+* Prevent the client from displaying the text it has sent. Consider
+  that the return of the text is a kind of a reciept for that the
+  server actually delivered the text. Filtering can be done on the
+  client or on the server, or indeed on both.
+
+* Make the service have a globally unique name, even when it is
+  started without the name (-n <name>) option.
+
+* Add to the client the option to provide a sender name on the
+  commandline.
+
+* Make the client automatically connect to an appropriate server. This
+  may be the first one found, the one most recently used or one
+  statically configured in a user preference set. Which is more
+  useful?
+
+
+Mandatory tasks, choose one:
+
+1 Develop a client and service that allows the distribution of
+  extended modalities, like graphics and sound. Optionally, generalise
+  the solution to include any executable Java object. Consider the
+  impact on security of doing so.
+
+2 Enable all clients connected to the service to see whenever a client
+  joins or leaves the chat. Add a user command to the client that
+  allows the user to list users currently joined to the
+  service. Consider the possibility that the list is longer than there
+  are lines on the screen. Make this information meaningful to the
+  maintainer of the service, so that it clearly shows information
+  about the client, the user and (upon disconnect) session statistics.
+
+3 Implement a semi-transparent service (proxy) that sits between the
+  client and the real service. Solve the problem of how to distinguish
+  commands aimed at the proxy from those aimed at the chat service.
+  The proxy should be able to do something meaningful, like
+  translating between languages, or adding Eliza-like comments, but
+  this functionality need only be illustrated. A simple text
+  transformation like word capitalization or wovel replacement is
+  sufficient.
+
+4 Design and implement a solution that connects two LANs on each
+  side of a firewall. RMI and Jini discovery by multicast are assumed
+  not to work through the firewall, but a few specific high-numbered
+  ports can made available if needed.
+
+5 Create a super-server that appears like a client to ordinary
+  servers. Have the super-server join with all ordinary servers to
+  create the illusion that all users are in the same chat.
+  Hint: the selective flooding routing algorithm.
+
+6 Add an AFK (Away From Keyboard) detector that automatically notifies
+  the other clients when someone has been inactive for a certain
+  period of time. The message should be automatically generated when
+  the timeout period expires. Add a command in the client for turning
+  on and off the display of such automated messages. Design decisions:
+  Should the detector be in the client or in the server? Should it be
+  possible for the user to turn off the detector? How long should the
+  timeout period be? Should it be the same for everyone or should it
+  be possible to customize for each client?
+
+
+The work is done in groups of two.
+
+The group should do the following:
+
+- Implement your selected task on the provided software.
+
+- Write and print a report (2-3 pgs) in which you:
+
+  	* indicate the choosen task
+
+	* document your design decisions and implementation strategy
+
+- Prepare a short oral presentation and demo of the running system.
+
+
