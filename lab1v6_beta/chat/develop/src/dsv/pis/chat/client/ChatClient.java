@@ -447,7 +447,7 @@ public class ChatClient
     "disconnect        Break the connection to the server",
     "quit              Exit the client",
     "help              This text",
-    "users				List connected users"
+    "users             List connected users"
   };
 
   /**
@@ -466,7 +466,7 @@ public class ChatClient
 		  if(myServer == null)
 			  System.out.println("You are not connected...");
 		  else {
-			  System.out.println("User name\t\ttime (h:m:s)");
+			  System.out.println("User name\t\t\ttime (h:m:s)");
 			  System.out.println("--------------------------------------------");
 			  List<String> users = myServer.registeredUsers();
 			  for(String u : users) {

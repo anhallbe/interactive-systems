@@ -191,9 +191,8 @@ public class ChatServer
    * simultaneous update of the client list.
    * @param rel  The RemoteEventListener implementation to add.
    */
-  protected synchronized void addClient (RemoteEventListener rel, String name) {
+  protected synchronized void addClient (RemoteEventListener rel) {
     clients.add (rel);
-    registeredClientMap.put(rel.hashCode(), new ClientWrapper(name, System.currentTimeMillis()));
     System.out.println ("Added client : " + rel.toString ());
   }
 
@@ -205,7 +204,6 @@ public class ChatServer
    */
   protected synchronized void removeClient (RemoteEventListener rel) {
     clients.remove (rel);
-    registeredClientMap.remove(rel.hashCode());
     System.out.println ("Removed client : " + rel.toString ());
   }
 
@@ -230,7 +228,9 @@ public class ChatServer
     throws java.rmi.RemoteException
   {
     if (rel != null) {
-      addClient (rel, name);
+      addClient (rel);
+      registeredClientMap.put(rel.hashCode(), new ClientWrapper(name, System.currentTimeMillis()));
+      addMessage("MESSAGE FROM SERVER: " + name + " joined.");
     }
   }
 
@@ -241,6 +241,10 @@ public class ChatServer
   {
     if (rel != null) {
       removeClient (rel);
+      int key = rel.hashCode();
+      String name = registeredClientMap.get(key).getUsername();
+      registeredClientMap.remove(key);
+      addMessage("MESSAGE FROM SERVER: " + name + " left.");
     }
   }
   
@@ -276,7 +280,9 @@ public class ChatServer
 	public void changeName(RemoteEventListener rel, String newName)
 			throws RemoteException {
 		int key = rel.hashCode();
+		String oldName = registeredClientMap.get(key).getUsername();
 		registeredClientMap.get(key).setUsername(newName);
+		addMessage("MESSAGE FROM SERVER: " + oldName + " changed name to " + newName);
 	}
 
   /**
