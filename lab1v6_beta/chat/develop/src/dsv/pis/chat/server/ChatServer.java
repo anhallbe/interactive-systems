@@ -18,10 +18,23 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.InetAddress;
 import java.rmi.RMISecurityManager;
+import java.rmi.RemoteException;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 import java.util.Vector;
 
 // Jini
+
+
+
+
+
+
+
 
 import net.jini.core.entry.*;
 import net.jini.core.event.*;
@@ -41,6 +54,13 @@ public class ChatServer
     ChatServerInterface,	// for clients
     Runnable			// for the distribution thread.
 {
+	/**
+	 * This map contains all the currently registered clients.
+	 * They are mapped using the hashCode for their respective
+	 * RemoteEventListener.
+	 */
+	protected Map<Integer, ClientWrapper> registeredClientMap = new LinkedHashMap<Integer, ClientWrapper>();
+	
   /**
    * The server's message counter. Increments monotonically with each
    * message dispatched.
@@ -57,7 +77,7 @@ public class ChatServer
    * The notification objects of registered clients are held in this
    * vector.
    */
-  protected Vector clients = new Vector ();
+  protected Vector<RemoteEventListener> clients = new Vector<>();
 
   /**
    * The printed name of this server instance.
@@ -171,8 +191,9 @@ public class ChatServer
    * simultaneous update of the client list.
    * @param rel  The RemoteEventListener implementation to add.
    */
-  protected synchronized void addClient (RemoteEventListener rel) {
+  protected synchronized void addClient (RemoteEventListener rel, String name) {
     clients.add (rel);
+    registeredClientMap.put(rel.hashCode(), new ClientWrapper(name, System.currentTimeMillis()));
     System.out.println ("Added client : " + rel.toString ());
   }
 
@@ -184,6 +205,7 @@ public class ChatServer
    */
   protected synchronized void removeClient (RemoteEventListener rel) {
     clients.remove (rel);
+    registeredClientMap.remove(rel.hashCode());
     System.out.println ("Removed client : " + rel.toString ());
   }
 
@@ -204,11 +226,11 @@ public class ChatServer
 
   // In interface ChatServerInterface
 
-  public void register (RemoteEventListener rel)
+  public void register (RemoteEventListener rel, String name)
     throws java.rmi.RemoteException
   {
     if (rel != null) {
-      addClient (rel);
+      addClient (rel, name);
     }
   }
 
@@ -221,6 +243,41 @@ public class ChatServer
       removeClient (rel);
     }
   }
+  
+  // In interface ChatServerInterface
+  @Override
+  public List<String> registeredUsers() throws RemoteException {
+	  List<String> result = new ArrayList<String>();
+	  for(RemoteEventListener rel : clients) {
+//		  Date now = new Date();
+		  int key = rel.hashCode();
+		  ClientWrapper client = registeredClientMap.get(key);
+		  String timeString = time(client.getConnectionTime(), System.currentTimeMillis());
+		  result.add(client.getUsername() + "\t\t" + timeString);
+	  }
+	  return result;
+  }
+  
+  /**
+   * Convert a time period to a user-friendly format: dd:hh:mm:ss
+   * @param start
+   * @param end
+   * @return
+   */
+  private String time(long start, long end) {
+	  long diff = end-start;
+	  long seconds = (diff / 1000) % 60;
+	  long minutes = (diff / (1000 * 60)) % 60;
+	  long hours = (diff / (1000 * 60 * 60)) % 24;
+	  return hours + ":" + minutes + ":" + seconds;
+  }
+  
+  @Override
+	public void changeName(RemoteEventListener rel, String newName)
+			throws RemoteException {
+		int key = rel.hashCode();
+		registeredClientMap.get(key).setUsername(newName);
+	}
 
   /**
    * This method is where the delivery thread (in method run()) rests

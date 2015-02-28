@@ -7,6 +7,7 @@
 package dsv.pis.chat.server;
 
 import java.rmi.*;
+import java.util.List;
 
 import net.jini.core.event.RemoteEventListener;
 
@@ -38,7 +39,7 @@ public interface ChatServerInterface
    * @param rel An object that implements net.jini.core.event.RemoteEvent
    *            interface.
    */
-  public void register (RemoteEventListener rel)
+  public void register (RemoteEventListener rel, String username)
     throws java.rmi.RemoteException;
 
   /**
@@ -50,4 +51,19 @@ public interface ChatServerInterface
    */
   public void unregister (RemoteEventListener rel)
     throws java.rmi.RemoteException;
+  
+  /**
+   * Used by ChatClient to list the users currently connected to the service.
+   * @return A list of users: {username, time}
+   * @throws java.rmi.RemoteException
+   */
+  public List<String> registeredUsers() throws java.rmi.RemoteException;
+  
+  /**
+   * Change username
+   * @param rel
+   * @param newName
+   * @throws java.rmi.RemoteException
+   */
+  public void changeName(RemoteEventListener rel, String newName) throws java.rmi.RemoteException;
 }

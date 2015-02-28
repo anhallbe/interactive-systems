@@ -41,14 +41,14 @@
     <mkdir dir="${dir.build}"/>
     <mkdir dir="${dir.dist}"/>
   </target>
-  
+
   <target name="compile" depends="init" description="Compile source code">
     <!-- Compile all code in the source directory, put class files in build directory. -->
     <javac debug="true"
            deprecation="true"
 	   destdir="${dir.build}"
-	   source="1.4"
-	   target="1.4"
+	   source="1.7"
+	   target="1.7"
 	   srcdir="${dir.src}">
       <classpath refid="project.class.path"/>
     </javac>
@@ -82,7 +82,8 @@
     <jar basedir="${dir.build}" compress="true"
          destfile="${dir.dist}/${servercapsname}.jar"
          manifest="${dir.manifest}/${servercapsname}.manifest"
-         includes="**/ChatServer.class,\
+         includes="**/ClientWrapper.class,\
+    			   **/ChatServer.class,\
                    **/ChatServer_Stub.class,\
                    **/ChatServer_Skel.class,\
                    **/ChatNotification.class,\

@@ -14,18 +14,19 @@ import java.lang.*;
 import java.rmi.*;
 import java.util.ArrayList;
 import java.util.Hashtable;
+import java.util.List;
 import java.util.Vector;
 
 // Jini
+
+
+
 
 import net.jini.core.entry.*;
 import net.jini.core.event.*;
 import net.jini.core.lookup.*;
 import net.jini.lookup.*;
 import net.jini.lookup.entry.*;
-
-// Chatserver
-
 import dsv.pis.chat.server.ChatServerInterface;
 import dsv.pis.chat.server.ChatNotification;
 
@@ -98,7 +99,7 @@ public class ChatClient
   {
     // Create a service template so the lookup cache will have something
     // to use for matching found services. There are three ways of matching
-    // against a service; the service id, an array of service types 
+    // against a service; the service id, an array of service types
     // (interface classes) or an array of attributes (Entry). Here we
     // just use the interface implemented by the service.
 
@@ -296,7 +297,9 @@ public class ChatClient
 	  System.out.flush ();
 
 	  try {
-	    server.register (this);
+		if(myName == null)
+			myName = "anonymous";
+	    server.register (this, myName);
 	    newServer = server;
 	    System.out.println ("ok]");
 	  }
@@ -317,12 +320,12 @@ public class ChatClient
       System.out.println ("[No servers matching " +
 			  serverNamePattern +
 			  " found]");
-	
+
     }
     else {
       System.out.println ("[No servers around]");
     }
-      
+
     return -1;
   }
 
@@ -345,12 +348,19 @@ public class ChatClient
 	myName = null;
       }
     }
-    
+
     if (myName == null) {
       myName = System.getProperty ("user.name");
     }
+    
+    try {
+    	if(myServer != null)
+    		myServer.changeName(this, myName);
+	} catch (RemoteException e) {
+		System.out.println("Server could not change my name to " + myName);
+	}
   }
-  
+
   /**
    * This method implements the send command which is implicit in the
    * command interpreter (the input line does not start with a period).
@@ -422,7 +432,7 @@ public class ChatClient
 
       System.out.println ("]");
     }
-    
+
   }
 
   /**
@@ -436,7 +446,8 @@ public class ChatClient
     "connect <string>  Connect to a server with a matching string",
     "disconnect        Break the connection to the server",
     "quit              Exit the client",
-    "help              This text"
+    "help              This text",
+    "users				List connected users"
   };
 
   /**
@@ -448,6 +459,23 @@ public class ChatClient
     for (int i = 0; i < cmdHelp.length; i++) {
       System.out.println ("[" + cmdHelp[i] + "]");
     }
+  }
+  
+  protected void showRegisteredUsers() {
+	  try {
+		  if(myServer == null)
+			  System.out.println("You are not connected...");
+		  else {
+			  System.out.println("User name\t\ttime (h:m:s)");
+			  System.out.println("--------------------------------------------");
+			  List<String> users = myServer.registeredUsers();
+			  for(String u : users) {
+				  System.out.println(u);
+			  }
+		  }
+	} catch (RemoteException e) {
+		e.printStackTrace();
+	}
   }
 
   /**
@@ -483,7 +511,7 @@ public class ChatClient
   public void readLoop () {
     boolean halted = false;
     BufferedReader d = new BufferedReader(new InputStreamReader(System.in));
-    
+
     System.out.println ("[Output from the client is in braces]");
     System.out.println ("[Commands start with '.' (period). Try .help]");
     System.out.println ("[When connected, type text and hit return to send]");
@@ -536,7 +564,7 @@ public class ChatClient
 	}
 
 	// Then recompose the real words into a string array again.
-	// (This is not strictly necessary; we could work with the 
+	// (This is not strictly necessary; we could work with the
 	// arrayList below, but when the problem was detected the
 	// code was already written in terms of a string array.)
 	String [] argv =
@@ -570,6 +598,9 @@ public class ChatClient
 	}
 	else if ("help".startsWith (verb)) {
 	  showHelp (argv);
+	}
+	else if("users".startsWith(verb)) {
+		showRegisteredUsers();
 	}
 	else {
 	  System.out.println ("[" + verb + ": unknown command]");
@@ -614,4 +645,3 @@ public class ChatClient
     cc.readLoop ();
   }
 }
-
