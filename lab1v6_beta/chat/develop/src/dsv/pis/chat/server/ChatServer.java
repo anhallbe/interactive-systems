@@ -20,6 +20,7 @@ import java.net.InetAddress;
 import java.rmi.RMISecurityManager;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
@@ -28,6 +29,7 @@ import java.util.Map;
 import java.util.Vector;
 
 // Jini
+
 
 
 
@@ -251,13 +253,24 @@ public class ChatServer
   // In interface ChatServerInterface
   @Override
   public List<String> registeredUsers() throws RemoteException {
+	  List<String> result = getRegisteredUsers();
+	  Collections.sort(result);
+	  return result;
+  }
+  
+  /**
+   * This method needs to be synchronized because clients and clientMap may be modified during the call.
+   * @return A list of registered users:   "username hh:mm:ss"
+   */
+  protected synchronized List<String> getRegisteredUsers() {
 	  List<String> result = new ArrayList<String>();
 	  for(RemoteEventListener rel : clients) {
-//		  Date now = new Date();
 		  int key = rel.hashCode();
 		  ClientWrapper client = registeredClientMap.get(key);
-		  String timeString = time(client.getConnectionTime(), System.currentTimeMillis());
-		  result.add(client.getUsername() + "\t\t" + timeString);
+		  if(client != null) {	//Can be null if client crashed without properly disconnecting...
+			  String timeString = time(client.getConnectionTime(), System.currentTimeMillis());
+			  result.add(client.getUsername() + "\t\t\t" + timeString);
+		  }
 	  }
 	  return result;
   }
