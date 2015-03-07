@@ -1,0 +1,2 @@
+Main-Class: dsv.pis.gotag.deedee.Deedee
+Class-Path: Bailiff-dl.jar util.jar jini-core.jar jini-ext.jar reggie-dl.jar
