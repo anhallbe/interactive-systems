@@ -318,7 +318,6 @@ public class Bailiff extends java.rmi.server.UnicastRemoteObject // for RMI
 	@Override
 	public boolean tag(UUID name) throws RemoteException {
 		Player target = (Player) registeredPlayers.get(name);
-//		bff.tagFlash();
 		return target.tag();
 	}
 	
@@ -359,7 +358,6 @@ public class Bailiff extends java.rmi.server.UnicastRemoteObject // for RMI
 	public Bailiff(String room, String user, boolean debug, Logger log)
 			throws java.rmi.RemoteException, java.net.UnknownHostException,
 			java.io.IOException {
-		bff = new BailiffFrame(this);
 		this.log = (log == null) ? new Logger() : log;
 		this.user = user;
 		this.room = room;
@@ -392,6 +390,7 @@ public class Bailiff extends java.rmi.server.UnicastRemoteObject // for RMI
 				null, // Default Service Discovery Manager
 				null // Default Lease Renewal Manager
 		);
+		this.bff = new BailiffFrame(this);
 	}
 
 	/**

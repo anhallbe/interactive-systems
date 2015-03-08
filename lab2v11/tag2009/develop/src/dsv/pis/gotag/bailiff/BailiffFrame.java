@@ -10,6 +10,7 @@ import java.awt.event.*;
 import java.util.*;
 
 import javax.swing.*;
+import javax.swing.Timer;
 import javax.swing.event.*;
 import javax.swing.border.*;
 
@@ -132,6 +133,10 @@ public class BailiffFrame extends JFrame {
 		}).start();
 	}
 
+	/**
+	 * Called by the Bailiff to update the number of players should be shown.
+	 * @param n
+	 */
 	public void updatePlayers(final int n) {
 		SwingUtilities.invokeLater(new Runnable() {
 			@Override
@@ -141,6 +146,10 @@ public class BailiffFrame extends JFrame {
 		});
 	}
 	
+	/**
+	 * Called by the bailiff to indicate whether the "it" player is present.
+	 * @param itIsInBailiff
+	 */
 	public void updateColor(final boolean itIsInBailiff) {
 		SwingUtilities.invokeLater(new Runnable() {
 			@Override
@@ -152,19 +161,4 @@ public class BailiffFrame extends JFrame {
 			}
 		});
 	}
-	
-//	public void tagFlash() {
-//		SwingUtilities.invokeLater(new Runnable() {
-//			@Override
-//			public void run() {
-//				numPlayerLabel.setBackground(Color.GREEN);
-////				try {
-////					Thread.sleep(100);
-////				} catch (InterruptedException e) {
-////					e.printStackTrace();
-////				}
-////				numPlayerLabel.setBackground(Color.WHITE);
-//			}
-//		});
-//	}
 }
