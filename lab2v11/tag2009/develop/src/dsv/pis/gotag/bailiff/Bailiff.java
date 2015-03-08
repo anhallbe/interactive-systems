@@ -12,6 +12,7 @@ import java.net.*;
 import java.rmi.*;
 import java.rmi.server.*;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 import net.jini.core.entry.*;
 import net.jini.core.lookup.*;
@@ -19,8 +20,10 @@ import net.jini.core.discovery.*;
 import net.jini.lease.*;
 import net.jini.lookup.*;
 import net.jini.lookup.entry.*;
-
-import dsv.pis.gotag.util.*;
+import dsv.pis.gotag.player.Player;
+import dsv.pis.gotag.util.CmdlnOption;
+import dsv.pis.gotag.util.Commandline;
+import dsv.pis.gotag.util.Logger;
 
 /**
  * The Bailiff is a Jini service that provides an execution environment for
@@ -49,6 +52,9 @@ public class Bailiff extends java.rmi.server.UnicastRemoteObject // for RMI
 	protected Map propertyMap;
 	protected JoinManager bf_joinmanager;
 	protected InetAddress myInetAddress;
+	
+	protected BailiffFrame bff;
+	protected Map<UUID, Object> registeredPlayers;
 
 	protected void debugMsg(String s) {
 		if (debug) {
@@ -182,6 +188,8 @@ public class Bailiff extends java.rmi.server.UnicastRemoteObject // for RMI
 		 *             can not be found.
 		 */
 		public void initialize() throws java.lang.NoSuchMethodException {
+//			registeredPlayers.put(((Player)myObj).getName(), myObj);
+			
 			myMethod = myObj.getClass().getMethod(myCb, myParms);
 			setContextClassLoader(myObj.getClass().getClassLoader());
 		}
@@ -192,12 +200,25 @@ public class Bailiff extends java.rmi.server.UnicastRemoteObject // for RMI
 		 */
 		public void run() {
 			try {
+				registeredPlayers.put(((Player)myObj).getName(), myObj);
+				//update gui
+				bff.updatePlayers(registeredPlayers.size());
+				if(((Player)myObj).isIt())
+					bff.updateColor(true);
+				
+//				System.out.println(((Player)myObj).getName() + " arrived.");
 				myMethod.invoke(myObj, myArgs);
 			} catch (Throwable t) {
 				if (debug) {
 					log.entry(t);
 				}
 			}
+			registeredPlayers.remove(((Player)myObj).getName());
+			//update gui
+			bff.updatePlayers(registeredPlayers.size());
+			if(((Player)myObj).isIt())
+				bff.updateColor(false);
+//			System.out.println(((Player)myObj).getName() + " left.");
 		}
 	} // class agitator
 
@@ -281,9 +302,35 @@ public class Bailiff extends java.rmi.server.UnicastRemoteObject // for RMI
 			log.entry("<migrate obj=\"" + obj + "\" cb=\"" + cb + "\" args=\""
 					+ args + "\"/>");
 		}
+//		System.out.println("TEST");
 		agitator agt = new agitator(obj, cb, args);
 		agt.initialize();
 		agt.start();
+	}
+	
+	@Override
+	public List<UUID> playersInBailiff() throws RemoteException {
+		List<UUID> result = new ArrayList<UUID>();
+		result.addAll(registeredPlayers.keySet());
+		return result;
+	}
+	
+	@Override
+	public boolean tag(UUID name) throws RemoteException {
+		Player target = (Player) registeredPlayers.get(name);
+//		bff.tagFlash();
+		return target.tag();
+	}
+	
+	@Override
+	public boolean isIt(UUID name) throws RemoteException {
+		Player p = (Player) registeredPlayers.get(name);
+		return p.isIt();
+	}
+	
+	@Override
+	public String getRoomName() throws RemoteException {
+		return getRoom();
 	}
 
 	/**
@@ -312,12 +359,14 @@ public class Bailiff extends java.rmi.server.UnicastRemoteObject // for RMI
 	public Bailiff(String room, String user, boolean debug, Logger log)
 			throws java.rmi.RemoteException, java.net.UnknownHostException,
 			java.io.IOException {
+		bff = new BailiffFrame(this);
 		this.log = (log == null) ? new Logger() : log;
 		this.user = user;
 		this.room = room;
 		myInetAddress = java.net.InetAddress.getLocalHost();
 		host = myInetAddress.getHostName().toLowerCase();
 		this.debug = (this.debug == true) ? true : debug;
+		this.registeredPlayers = new ConcurrentHashMap<UUID, Object>();
 
 		propertyMap = Collections.synchronizedMap(new HashMap());
 		propertyMap.put("hostname", host);
@@ -453,9 +502,9 @@ public class Bailiff extends java.rmi.server.UnicastRemoteObject // for RMI
 		// Set the RMI security manager.
 		System.setSecurityManager(new RMISecurityManager());
 		Bailiff bf = new Bailiff(room, user, debug, log);
-		if (noFrameOption.getIsSet() == false) {
-			BailiffFrame bff = new BailiffFrame(bf);
-		}
+//		if (noFrameOption.getIsSet() == false) {
+//			BailiffFrame bff = new BailiffFrame(bf);
+//		}
 	} // main
 
 } // public class Bailiff

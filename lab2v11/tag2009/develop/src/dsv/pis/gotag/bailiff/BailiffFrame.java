@@ -24,6 +24,7 @@ public class BailiffFrame extends JFrame {
 	 * The Bailiff service instance we front a GUI for.
 	 */
 	protected Bailiff bf;
+	protected JLabel numPlayerLabel;
 
 	/**
 	 * Creates a new Bailiff service GUI.
@@ -97,6 +98,10 @@ public class BailiffFrame extends JFrame {
 			}
 		});
 
+		numPlayerLabel = new JLabel("0", SwingConstants.CENTER);
+		numPlayerLabel.setFont(new Font("Serif", Font.BOLD, 30));
+		add(numPlayerLabel);
+		
 		// Do qualitative layout
 		pack();
 
@@ -127,4 +132,39 @@ public class BailiffFrame extends JFrame {
 		}).start();
 	}
 
+	public void updatePlayers(final int n) {
+		SwingUtilities.invokeLater(new Runnable() {
+			@Override
+			public void run() {
+				numPlayerLabel.setText("" + n);				
+			}
+		});
+	}
+	
+	public void updateColor(final boolean itIsInBailiff) {
+		SwingUtilities.invokeLater(new Runnable() {
+			@Override
+			public void run() {
+				if(itIsInBailiff)
+					numPlayerLabel.setForeground(Color.RED);
+				else
+					numPlayerLabel.setForeground(Color.BLACK);
+			}
+		});
+	}
+	
+//	public void tagFlash() {
+//		SwingUtilities.invokeLater(new Runnable() {
+//			@Override
+//			public void run() {
+//				numPlayerLabel.setBackground(Color.GREEN);
+////				try {
+////					Thread.sleep(100);
+////				} catch (InterruptedException e) {
+////					e.printStackTrace();
+////				}
+////				numPlayerLabel.setBackground(Color.WHITE);
+//			}
+//		});
+//	}
 }

@@ -5,6 +5,10 @@
 
 package dsv.pis.gotag.bailiff;
 
+import java.rmi.RemoteException;
+import java.util.List;
+import java.util.UUID;
+
 /**
  * This interface is for the Bailiff's clients. This is mobile code which move
  * into the Bailiff's JVM for execution.
@@ -49,4 +53,11 @@ public interface BailiffInterface extends java.rmi.Remote {
 	public void migrate(Object obj, String cb, Object[] args)
 			throws java.rmi.RemoteException, java.lang.NoSuchMethodException;
 
+	public List<UUID> playersInBailiff() throws RemoteException;
+	
+	public boolean isIt(UUID name) throws RemoteException;
+	
+	public boolean tag(UUID name) throws RemoteException;
+	
+	public String getRoomName() throws RemoteException;
 }

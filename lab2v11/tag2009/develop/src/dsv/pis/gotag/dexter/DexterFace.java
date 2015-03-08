@@ -20,7 +20,7 @@ public class DexterFace extends JApplet implements ActionListener {
 
 	final static BasicStroke stroke = new BasicStroke(2.0f);
 	final static BasicStroke wideStroke = new BasicStroke(8.0f);
-
+	
 	protected Timer timer;
 	protected int tix = 0;
 	protected Arc2D.Double smile;

@@ -13,14 +13,13 @@ public class CmdlnOption {
 	public static final int PAR_NOT = 0; // Accept no parameter
 	public static final int PAR_OPT = 2; // Parameter is optional
 	public static final int PAR_REQ = 6; // Parameter is required
-
 	protected String optionKey;
 	protected boolean allowArg = false;
 	protected boolean expectArg = false;
 	protected boolean isOptional = true;
 	protected String value;
 	protected boolean isSet = false;
-
+	
 	protected void parseFlags(int flags) {
 		isOptional = (flags & REQUIRED) == 0;
 		allowArg = (flags & PAR_OPT) == PAR_OPT;
