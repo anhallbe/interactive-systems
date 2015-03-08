@@ -117,7 +117,8 @@ public class Player implements Serializable {
 					if(successfulTag){
 						//I have tagged someone. Now what?
 						iAmIt = false;
-						print("Tagged " + target);
+//						print("Tagged " + target);
+						System.out.println(myName + ": TAGGED " + target);
 //						//run!
 						BailiffInterface dest = leastPopulatedBailiff(bailiffs);
 						try {
@@ -134,7 +135,7 @@ public class Player implements Serializable {
 					//My bailiff is empty, need to move to another one
 					BailiffInterface dest = mostPopulatedBailiff(bailiffs);
 					try {
-						print("(it) moving to " + dest.getRoomName());
+//						print("(it) moving to " + dest.getRoomName());
 						dest.migrate(this, "topLevel", new Object[]{});
 						SDM.terminate();
 						return;
@@ -157,7 +158,7 @@ public class Player implements Serializable {
 					BailiffInterface dest = leastPopulatedBailiff(bailiffs);
 					try {
 						//No need to jump to my own bailiff?
-						print("(not it) moving to " + dest.getRoomName());
+//						print("(not it) moving to " + dest.getRoomName());
 						dest.migrate(this, "topLevel", new Object[]{});
 						SDM.terminate();
 						return;
