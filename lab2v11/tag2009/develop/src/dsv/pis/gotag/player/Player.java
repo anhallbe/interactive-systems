@@ -50,10 +50,16 @@ public class Player implements Serializable {
 		return myName;
 	}
 	
+	/**
+	* Called by the bailiff (proxy) to ask if this player is the Tagger (it)
+	**/
 	public synchronized boolean isIt() {
 		return iAmIt;
 	}
 	
+	/**
+	* Called by the bailiff (proxy) to tag this player.
+	**/
 	public synchronized boolean tag() {
 //		print("I was tagged!");
 		iAmIt = true;
@@ -170,6 +176,9 @@ public class Player implements Serializable {
 		}
 	}
 	
+	/**
+	* Find a bailiff that contains a given user (id)
+	**/
 	private BailiffInterface findBailiff(UUID id, List<BailiffInterface> blist) throws RemoteException {
 		BailiffInterface result = null;
 		for(BailiffInterface b : blist)
@@ -179,6 +188,9 @@ public class Player implements Serializable {
 		return result;
 	}
 	
+	/**
+	* Find the bailiff with the highest number of players in it. This is a good target for the tagger.
+	**/
 	private BailiffInterface mostPopulatedBailiff(List<BailiffInterface> bailiffs) throws RemoteException {
 		BailiffInterface result = null;
 		int max = -1;
@@ -192,6 +204,9 @@ public class Player implements Serializable {
 		return result;
 	}
 	
+	/**
+	* Find the bailiff with the lowest number of players. A good target to avoid the tagger.
+	**/
 	private BailiffInterface leastPopulatedBailiff(List<BailiffInterface> bailiffs) throws RemoteException {
 		BailiffInterface result = null;
 		int min = Integer.MAX_VALUE;
